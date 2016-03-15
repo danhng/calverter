@@ -1,0 +1,13 @@
+1. 
+What to do in loading screen?
+- Work out how many digits would fit in to the screen width -> 
+	Used to display big exponential results appropriately.
+- Work out number limits:
+	MIN MAX in dec mode
+	MIN MAX in float mode
+
+Operations on floating point number?
+- Bin, Oct, Hex experimental with floating point.
+:q
+
+
