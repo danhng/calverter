@@ -1,3 +1,5 @@
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -5,7 +7,7 @@ import java.util.Arrays;
  * @author Danh Thanh Nguyen <d.t.nguyen@newcastle.ac.uk>
  * date created: 14/03/2016
  */
-public class Number {
+public class Number implements Evaluable, Expressible {
 
     public static final int BIN_MODE = 0;
     public static final int OCT_MODE = 1;
@@ -51,12 +53,39 @@ public class Number {
     //private boolean isFloatMode;
     private ArrayList<String> reps; // string reps of the number
 
-    // constructor
+    // constructors
     public Number(int inputMode, String rep) {
         this.inputMode = inputMode;
         this.userInput = rep;
     }
 
+    public Number(long iValue, double fValue) {
+        this.ivalue = iValue;
+        this.fvalue = fValue;
+    }
+
+    /**
+     * default fValue
+     * @param iValue
+     */
+    public Number(long iValue) {
+        this.ivalue = iValue;
+        fvalue = (double) iValue;
+    }
+
+    /**
+     * default iValue is the rounded-up
+     * @param fValue
+     */
+    public Number(double fValue) {
+        this.fvalue = fValue;
+        ivalue = Math.round(fValue);
+    }
+
+    /**
+     *
+     * @return
+     */
     public String getUserInput() {
         return userInput;
     }
@@ -108,6 +137,8 @@ public class Number {
         this.inputMode = inputMode;
     }
 
+
+
     @Override
     public String toString() {
         return "Number{" +
@@ -117,5 +148,45 @@ public class Number {
                 ", ivalue=" + ivalue +
                 ", reps=" + Arrays.toString(reps.toArray()) +
                 '}';
+    }
+
+    /**
+     * Return the evaluated decimal.
+     * <p>
+     * How the object is evaluated is entirely up to the implementation and it is the job of the implementor to make sure
+     * the decimal number evaluated is correct.
+     *
+     * @return the decimal evaluated from the object
+     */
+    @Override
+    public BigDecimal toDecimal() {
+        return new BigDecimal(fvalue);
+    }
+
+    /**
+     * Return the evaluated integer.
+     * <p>
+     * How the object is evaluated is entirely up to the implementation and it is the job of the implementor to make sure
+     * the integer evaluated is correct.
+     *
+     * @return the integer evaluated from the object
+     */
+    @Override
+    public BigInteger toInteger() {
+        return new BigInteger(String.valueOf(ivalue));
+    }
+
+    private void updateStringReps() {
+        //todo
+    }
+
+    @Override
+    public String toRep() {
+        return String.valueOf(fvalue);
+    }
+
+    @Override
+    public Category toCategory() {
+        return Category.OPERAND;
     }
 }

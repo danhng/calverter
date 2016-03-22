@@ -57,7 +57,7 @@ public class Debug {
         }
     }
 
-    private static void emerg(String format, Object[] args) {
+    public static void emerg(String format, Object[] args) {
         System.out.printf("[    EMERG    ] " + format, args);
     }
 

@@ -2,7 +2,9 @@ import org.junit.*;
 import org.junit.Test;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.IntSummaryStatistics;
 
 import static org.junit.Assert.*;
 
@@ -36,6 +38,9 @@ public class NumberHelperTest {
             assertTrue(NumberHelper.isFloat(floats));
         for (String floats : falseFloats)
             assertFalse(NumberHelper.isFloat(floats));
+
+        long v = (long) -5 | -3;
+    //        System.out.printf("pow is: %s, size \n", Long.toBinaryString();
     }
 
     @Test
@@ -55,7 +60,6 @@ public class NumberHelperTest {
                     }
                     catch (AssertionError e) {
                         throw new AssertionError("         Failed. Expected: "+expected+", Actual: "+actual+"\n");
-
                     }
                 }
         }
@@ -63,7 +67,11 @@ public class NumberHelperTest {
 
     @Test
     public void testFillUpTo() throws Exception {
-
+        StringBuilder i = new StringBuilder();
+        ArrayList<StringBuilder> l = new ArrayList<>();
+        l.add(i);
+        l.get(0).append('s');
+        System.out.println("New string builder: " + i.toString());
     }
 
     @Test

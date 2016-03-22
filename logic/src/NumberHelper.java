@@ -82,9 +82,16 @@ public class NumberHelper {
      * @param format formatting options
      * @return the output string converted to {modeOut} format
      */
-    public static String toOctDecHex(int modeOut, String rep, int modeIn, int format) {
+    private static String toOctDecHex(int modeOut, String rep, int modeIn, int format) {
         String out;
-
+        if (modeOut != Number.OCT_MODE && modeOut != Number.DEC_MODE && modeOut != Number.HEX_MODE) {
+            try {
+                Debug.warn("toOctDecHex requires Oct/Dec/Hex modeOut. %s given\n", Number.FORMATS[modeOut]);
+            }
+            catch (Exception e) {
+                Debug.warn("Invalid format mode. %d\n", modeOut);
+            }
+        }
         // if modeIn == modeOut already
         if (modeIn == modeOut) {
             // do the formatting if needed
@@ -135,7 +142,16 @@ public class NumberHelper {
                 groupDigits(out, Number.GROUPS[modeOut], Number.DELIMETERS[modeOut]) : out;
     }
 
+    /**
+     * Flip all bits of a binary string
+     * @param binRep the binary string in which all bits are to be flipped
+     * @return the flipped output
+     */
     private static String flipBits(String binRep) {
+        if (!isValidFormat(binRep, Number.BIN_MODE)) {
+            Debug.warn("flipBits requires a valid binary string. %s given.\n", binRep);
+            return Number.NAN;
+        }
         char[] characters = binRep.toCharArray();
         for(int i = 0; i < characters.length; i++) {
             characters[i] = characters[i] == '0' ? '1' : '0';
@@ -150,7 +166,7 @@ public class NumberHelper {
      * @param format format of the output string representation
      * @return the output number as binary string
      */
-    public static String toBin(int modeIn, String rep, int format) {
+    private static String toBin(int modeIn, String rep, int format) {
         //int BITS = Long.BYTES * 8;
         String out = Number.NAN;
 
