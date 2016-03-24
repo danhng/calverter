@@ -1,6 +1,5 @@
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
@@ -31,7 +30,7 @@ public class Number implements Evaluable, Expressible {
     public static final int[] GROUPS = {4, 3, 3, 4};
 
     // conventional group delimiters for number formats;
-    public static final char[] DELIMETERS = {' ', ' ', ',', ' '};
+    public static final char[] DELIMITERS = {' ', ' ', ',', ' '};
 
     // String rep used when some mode is not supported for some required input value.
     public static String NAN = "N/A";
@@ -47,21 +46,25 @@ public class Number implements Evaluable, Expressible {
     public static final int DO_GROUPING = 2;
 
     private String userInput; // original user input
-    private int inputMode; // mode the the input
+    private int modeIn; // mode the the input
     private double fvalue; // the float value
     private long  ivalue; // the int value
     //private boolean isFloatMode;
-    private ArrayList<String> reps; // string reps of the number
+    private String[] reps; // string reps of the number
 
     // constructors
-    public Number(int inputMode, String rep) {
-        this.inputMode = inputMode;
+    public Number(int modeIn, String rep) {
+        this.modeIn = modeIn;
         this.userInput = rep;
+        updateStringReps();
     }
 
     public Number(long iValue, double fValue) {
         this.ivalue = iValue;
         this.fvalue = fValue;
+        modeIn = DEC_MODE;
+        userInput = String.valueOf(fValue);
+        updateStringReps();
     }
 
     /**
@@ -71,6 +74,9 @@ public class Number implements Evaluable, Expressible {
     public Number(long iValue) {
         this.ivalue = iValue;
         fvalue = (double) iValue;
+        userInput = String.valueOf(iValue);
+        modeIn = DEC_MODE;
+        updateStringReps();
     }
 
     /**
@@ -80,6 +86,9 @@ public class Number implements Evaluable, Expressible {
     public Number(double fValue) {
         this.fvalue = fValue;
         ivalue = Math.round(fValue);
+        userInput = String.valueOf(fValue);
+        modeIn = DEC_MODE;
+        updateStringReps();
     }
 
     /**
@@ -98,8 +107,8 @@ public class Number implements Evaluable, Expressible {
      * Re-update string reps based on the user input
      */
     private void refresh() {
-
-    }
+        reps = NumberHelper.toFormats(userInput, modeIn, NO_FORMAT);
+        }
 
     public double getFvalue() {
         return fvalue;
@@ -121,20 +130,20 @@ public class Number implements Evaluable, Expressible {
         return NumberHelper.isFloat(userInput);
     }
 
-    public ArrayList<String> getReps() {
+    public String[] getReps() {
         return reps;
     }
 
-    public void setReps(ArrayList<String> reps) {
+    public void setReps(String[] reps) {
         this.reps = reps;
     }
 
-    public int getInputMode() {
-        return inputMode;
+    public int getModeIn() {
+        return modeIn;
     }
 
-    public void setInputMode(int inputMode) {
-        this.inputMode = inputMode;
+    public void setModeIn(int modeIn) {
+        this.modeIn = modeIn;
     }
 
 
@@ -143,10 +152,10 @@ public class Number implements Evaluable, Expressible {
     public String toString() {
         return "Number{" +
                 "userInput='" + userInput + '\'' +
-                ", inputMode=" + inputMode +
+                ", modeIn=" + modeIn +
                 ", fvalue=" + fvalue +
                 ", ivalue=" + ivalue +
-                ", reps=" + Arrays.toString(reps.toArray()) +
+                ", reps=" + Arrays.toString(reps) +
                 '}';
     }
 
@@ -177,7 +186,7 @@ public class Number implements Evaluable, Expressible {
     }
 
     private void updateStringReps() {
-        //todo
+        refresh();
     }
 
     @Override
@@ -188,5 +197,21 @@ public class Number implements Evaluable, Expressible {
     @Override
     public Category toCategory() {
         return Category.OPERAND;
+    }
+
+    @Override
+    public Evaluable toEvaluable() {
+        return this;
+    }
+
+    /**
+     * Attempts to cast the Expressible to an Operator
+     *
+     * @return the cast Operator
+     * @throws ClassCastException if the Expressible cannot be cast to Operator
+     */
+    @Override
+    public Operator toOperator() {
+        throw new ClassCastException("Number objects cannot be cast to Operator: " + toRep());
     }
 }

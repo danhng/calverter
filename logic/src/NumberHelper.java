@@ -1,6 +1,7 @@
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  * @author Danh Thanh Nguyen <d.t.nguyen@newcastle.ac.uk>
@@ -39,7 +40,12 @@ public class NumberHelper {
             return false;
         }
         // return true only if there are both int part and dec part and dec part is not empty
-        return parts.length == 2 && !parts[1].isEmpty();
+        return parts.length == 2 && !parts[1].isEmpty() && !parts[1].matches("0*");
+    }
+
+    public static String[] toFormats(String rep, int modeIn, int format) {
+        return Arrays.asList(Number.BIN_MODE, Number.OCT_MODE, Number.DEC_MODE, Number.HEX_MODE)
+                .stream().map(i -> toFormat(i, rep, modeIn, format)).collect(Collectors.toList()).toArray(new String[1]);
     }
 
     /**
@@ -69,6 +75,7 @@ public class NumberHelper {
         }
     }
 
+
     private static int getNearestMulOf(int in, int factor) {
         return (int) (Math.ceil((double) in / factor) * factor);
     }
@@ -84,6 +91,7 @@ public class NumberHelper {
      */
     private static String toOctDecHex(int modeOut, String rep, int modeIn, int format) {
         String out;
+        rep = succinct(rep);
         if (modeOut != Number.OCT_MODE && modeOut != Number.DEC_MODE && modeOut != Number.HEX_MODE) {
             try {
                 Debug.warn("toOctDecHex requires Oct/Dec/Hex modeOut. %s given\n", Number.FORMATS[modeOut]);
@@ -96,7 +104,7 @@ public class NumberHelper {
         if (modeIn == modeOut) {
             // do the formatting if needed
             return (format & Number.DO_GROUPING) > 0 ?
-                    groupDigits(rep, Number.GROUPS[modeOut], Number.DELIMETERS[modeOut]) : rep;
+                    groupDigits(rep, Number.GROUPS[modeOut], Number.DELIMITERS[modeOut]) : rep;
         }
         Long in;
         // else if the rep is decimal then we need to convert it to oct using the lib first
@@ -122,8 +130,8 @@ public class NumberHelper {
             // else if modeOut is either HEX or OCT then group 4 or 3 bin digits of the bin string and work out the corresponding chars.
             else {
                 // group digits as groups of modeOut (For convenient octal conversion)
-                String[] groups = groupDigits(bin, Number.GROUPS[modeOut], Number.DELIMETERS[Number.BIN_MODE])
-                        .split(String.valueOf(Number.DELIMETERS[Number.BIN_MODE]));
+                String[] groups = groupDigits(bin, Number.GROUPS[modeOut], Number.DELIMITERS[Number.BIN_MODE])
+                        .split(String.valueOf(Number.DELIMITERS[Number.BIN_MODE]));
                 Debug.debug("Groups of mode %d chars in binary is: %s\n", modeOut, Arrays.toString(groups));
 
                 // convert each group of {modeOut} binary digits to a modeOut value
@@ -139,7 +147,7 @@ public class NumberHelper {
         }
         // do the final formatting
         return (format & Number.DO_GROUPING) > 0 ?
-                groupDigits(out, Number.GROUPS[modeOut], Number.DELIMETERS[modeOut]) : out;
+                groupDigits(out, Number.GROUPS[modeOut], Number.DELIMITERS[modeOut]) : out;
     }
 
     /**
@@ -159,6 +167,12 @@ public class NumberHelper {
         return String.valueOf(characters);
     }
 
+    private static String succinct(String rep) {
+        if (rep.matches("-?[0-9]+\\.0*"))
+            return rep.split("\\.")[0];
+        return rep;
+    }
+
     /**
      * Convert any kind of number formats to binary format
      * @param modeIn the number format of the input
@@ -169,7 +183,7 @@ public class NumberHelper {
     private static String toBin(int modeIn, String rep, int format) {
         //int BITS = Long.BYTES * 8;
         String out = Number.NAN;
-
+        rep = succinct(rep);
         // todo binary for float not yet supported
         if (modeIn == Number.DEC_MODE &&  isFloat(rep)) {
             return Number.NAN;
@@ -181,7 +195,7 @@ public class NumberHelper {
             int c = getNearestMulOf(out.length(), Number.GROUPS[Number.BIN_MODE]);
             // fill up the most significant group if needed
             out = (format & Number.DO_STUFFING) == 1 ? fillUpTo(out, c, '0') : out;
-            return (format & Number.DO_GROUPING) != 0 ? groupDigits(out, Number.GROUPS[Number.BIN_MODE], Number.DELIMETERS[Number.BIN_MODE]) : out;
+            return (format & Number.DO_GROUPING) != 0 ? groupDigits(out, Number.GROUPS[Number.BIN_MODE], Number.DELIMITERS[Number.BIN_MODE]) : out;
         }
 
         // else if the rep is decimal then we need to convert it to bin using the lib first before do the stuffing.
@@ -207,7 +221,7 @@ public class NumberHelper {
                 }
                 out = String.valueOf(characters);
             }
-            return (format & Number.DO_GROUPING) > 0 ? groupDigits(out, Number.GROUPS[Number.BIN_MODE], Number.DELIMETERS[Number.BIN_MODE]) : out;
+            return (format & Number.DO_GROUPING) > 0 ? groupDigits(out, Number.GROUPS[Number.BIN_MODE], Number.DELIMITERS[Number.BIN_MODE]) : out;
         }
         //if modeIn is not decimal then we need to expand all digits
         else if (modeIn == Number.HEX_MODE || modeIn == Number.OCT_MODE) {
@@ -215,7 +229,7 @@ public class NumberHelper {
             Debug.debug("pre in non-dec int is: %d\n", in);
             out = Long.toBinaryString(in);
             out = (format & Number.DO_STUFFING) > 0 ? fillUpTo(out, getNearestMulOf(out.length(), Number.GROUPS[Number.BIN_MODE]), '0') : out;
-            return (format & Number.DO_GROUPING) > 0 ? groupDigits(out, Number.GROUPS[Number.BIN_MODE], Number.DELIMETERS[Number.BIN_MODE]) : out;
+            return (format & Number.DO_GROUPING) > 0 ? groupDigits(out, Number.GROUPS[Number.BIN_MODE], Number.DELIMITERS[Number.BIN_MODE]) : out;
         }
         // for all cases that are not handled yet, N/A will be returned.
         return out;

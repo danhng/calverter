@@ -36,4 +36,6 @@ public interface Evaluable {
      * @return the integer evaluated from the object
      */
     BigInteger toInteger();
+
+
 }

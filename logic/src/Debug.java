@@ -22,7 +22,7 @@ public class Debug {
     public static final int EMERG = 8;
 
 
-    private static int DEBUG_LEVEL = ERROR;
+    private static int DEBUG_LEVEL = DEBUG;
 
     public static int getDebugLevel() {
         return DEBUG_LEVEL;

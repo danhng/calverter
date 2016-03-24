@@ -6,7 +6,7 @@ import java.util.*;
  *
  * <p>
  * The class provides singleton static instances of operators provided by the applications which
- * can be retrieved through {@code  get} method with appropriate parameter.
+ * can be retrieved through {@link  Operator#getOperator(int)} method with appropriate parameter.
  * </p>
  *
  * <p>
@@ -22,7 +22,34 @@ import java.util.*;
  *         <br> Date created: 19/03/2016
  */
 
-  class Operator implements Expressible {
+  class Operator implements Expressible, Comparable<Operator>, Cloneable {
+
+    // IDs used for public operator retrievals
+
+    public static final int NEGATION = 0;
+
+    public static final int BITWISE_NOT = 1;
+
+    public static final int BITWISE_OR = 2;
+
+    public static final int BITWISE_AND = 3;
+
+    public static final int BITWISE_XOR = 4;
+
+    public static final int ADDITION = 5;
+
+    public static final int SUBTRACTION = 6;
+
+    public static final int MULTIPLICATION = 7;
+
+    public static final int DIVISION = 8;
+
+    public static final int MODULO = 9;
+
+    public static final int SHIFT_LEFT = 10;
+
+    public static final int SHIFT_RIGHT = 11;
+
 
     private static final int BINARY_COUNT = 2;
 
@@ -37,43 +64,43 @@ import java.util.*;
      */
 
     // bitwise or has the lowest priority. (binary)
-    public static final int BITWISE_OR_PRIORITY = 1;
+    private static final int BITWISE_OR_PRIORITY = 1;
 
     // bitwise xor operator (binary)
-    public static final int BITWISE_XOR_PRIORITY = 2;
+    private static final int BITWISE_XOR_PRIORITY = 2;
 
     // bitwise and operator (binary)
-    public static final int BITWISE_AND_PRIORITY = 3;
+    private static final int BITWISE_AND_PRIORITY = 3;
 
     // leftshit operator (binary)
-    public static final int SHIFT_LEFT_PRIORITY = 4;
+    private static final int SHIFT_LEFT_PRIORITY = 4;
 
     // rigthshift operator (binary)
-    public static final int SHIFT_RIGHT_PRIORITY = 4;
+    private static final int SHIFT_RIGHT_PRIORITY = 4;
 
     // addition operator (binary)
-    public static final int ADDITION_PRIORITY = 5;
+    private static final int ADDITION_PRIORITY = 5;
 
     // subtraction operator (binary)
-    public static final int SUBTRACTION_PRIORITY = 5;
+    private static final int SUBTRACTION_PRIORITY = 5;
 
     // multiplication operator (binary)
-    public static final int MULTIPLICATION_PRIORITY = 6;
+    private static final int MULTIPLICATION_PRIORITY = 6;
 
     // division operator (binary)
-    public static final int DIVISION_PRIORITY = 6;
+    private static final int DIVISION_PRIORITY = 6;
 
     // modulo operator (binary)
-    public static final int MODULO_PRIORITY = 6;
+    private static final int MODULO_PRIORITY = 6;
 
     // bitwise not operator (unary)
-    public static final int BITWISE_NOT_PRIORITY = 7;
+    private static final int BITWISE_NOT_PRIORITY = 7;
 
     // negation operator (unary)
-    public static final int NEGATION_PRIORITY = 7;
+    private static final int NEGATION_PRIORITY = 7;
 
     // parentheses enclosed operator got promoted and are guaranteed to have a higher priority than the unenclosed operators.
-    public static final int PARENTHESIS_PRIORITY = 8;
+    private static final int PARENTHESIS_PRIORITY = 8;
 
 
     /**
@@ -157,7 +184,7 @@ import java.util.*;
      * performing computations on operands and return a single result. (Such action is called discreteAction - actions that
      * return a single value)
      */
-    private Action action;
+    private final Action action;
 
     /**
      * Apply operator on to operands and return a single value. The number of operands must match the {@code operandsCount}.
@@ -175,7 +202,7 @@ import java.util.*;
 
     @Override
     public String toRep() {
-        return reps.get(0);
+        return name + "[" + priority + "]";
     }
 
     @Override
@@ -183,6 +210,31 @@ import java.util.*;
         return Category.OPERATOR;
     }
 
+    @Override
+    public Evaluable toEvaluable() {
+        throw new ClassCastException("Operator objects cannot be cast to Evaluable.");
+    }
+
+    /**
+     * Attempts to cast the Expressible to an Operator
+     *
+     * @return the cast Operator
+     * @throws ClassCastException if the Expressible cannot be cast to Operator
+     */
+    @Override
+    public Operator toOperator() {
+        return this;
+    }
+
+    @Override
+    public int compareTo(Operator o) {
+        return priority - o.getPriority();
+    }
+
+    @Override
+    public String toString() {
+        return reps.get(0);
+    }
     /**
      * The interface Action represents the action carried by the operators. An action should, but does not have to
      * return a result.
@@ -222,11 +274,17 @@ import java.util.*;
 
     }
 
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return new Operator(this.name, this.reps, this.priority, this.operandsCount, this.action);
+    }
+
     public ArrayList<String> getReps() {
         return reps;
     }
 
-    public void setReps(ArrayList<String> reps) {
+    private void setReps(ArrayList<String> reps) {
         this.reps = reps;
     }
 
@@ -234,7 +292,7 @@ import java.util.*;
         return priority;
     }
 
-    public void setPriority(int priority) {
+    private void setPriority(int priority) {
         this.priority = priority;
     }
 
@@ -242,7 +300,7 @@ import java.util.*;
         return operandsCount;
     }
 
-    public void setOperandsCount(int operandsCount) {
+    private void setOperandsCount(int operandsCount) {
         this.operandsCount = operandsCount;
     }
 
@@ -250,23 +308,45 @@ import java.util.*;
         return action;
     }
 
-    public void setAction(Action action) {
+/*    private void setAction(Action action) {
         this.action = action;
-    }
+    }*/
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    private void setName(String name) {
         this.name = name;
     }
+
+
+    /**
+     * Public retrievals of operators
+     * @param operator the operator index
+     * @return a clone of the operator
+     *
+     */
+    public static Operator getOperator(int operator) {
+        try {
+            return (Operator) SUPPORTED_OPERATORS[operator].clone();
+        } catch (CloneNotSupportedException e) {
+            Debug.warn("Objects of class Operator cannot be cloned.\n");
+            return null;
+        }
+        catch (IndexOutOfBoundsException e) {
+            Debug.warn("Operator index %d is not valid.\n", operator);
+            return null;
+        }
+    }
+
+
 
     /*******************************************************************************************************************
      * OPERATOR objects
      *
-     * Following are the objects that represent supported operators. All of these objects can be obtained directly from
-     * outside.
+     * Following are the objects that represent supported operators. All of these objects can be obtained indirectly from
+     * outside through {@link Operator#getOperator(int)}
      *
      * //todo is there a better way to collectively define these supported operators?
      ******************************************************************************************************************/
@@ -274,7 +354,7 @@ import java.util.*;
     /**
      * Negation operator
      */
-    public static final Operator NEGATION_OPERATOR = new Operator("NEGATION OPERATOR", new HashSet<String>(Arrays.asList(NEGATION_REPS)),
+    private static final Operator NEGATION_OPERATOR = new Operator("NEGATION", new HashSet<String>(Arrays.asList(NEGATION_REPS)),
             NEGATION_PRIORITY, UNARY_COUNT, new Action() {
         @Override
         public void actionVoid(Evaluable... terms) {
@@ -284,7 +364,7 @@ import java.util.*;
         @Override
         public Evaluable actionDiscrete(Evaluable... terms) {
             if (terms.length != UNARY_COUNT)
-                throwMismatchOperandCount("NEGATION OPERATOR", UNARY_COUNT, terms.length);
+                throwMismatchOperandCount("NEGATION", UNARY_COUNT, terms.length);
 
             // the numerical value (not the representation) matters
             return new Number(0 - terms[0].toInteger().longValue());
@@ -300,7 +380,7 @@ import java.util.*;
     /**
      * Not operator
      */
-    public static final Operator NOT_OPERATOR = new Operator("BITWISE NOT OPERATOR", new HashSet<String>(Arrays.asList(BITWISE_NOT_REPS)),
+    private static final Operator NOT_OPERATOR = new Operator("BITWISE NOT", new HashSet<String>(Arrays.asList(BITWISE_NOT_REPS)),
             BITWISE_NOT_PRIORITY, UNARY_COUNT, new Action() {
         @Override
         public void actionVoid(Evaluable... terms) {
@@ -310,7 +390,7 @@ import java.util.*;
         @Override
         public Evaluable actionDiscrete(Evaluable... terms) {
             if (terms.length != UNARY_COUNT)
-                throwMismatchOperandCount("BITWISE NOT OPERATOR", UNARY_COUNT, terms.length);
+                throwMismatchOperandCount("BITWISE NOT", UNARY_COUNT, terms.length);
 
             // the numerical value (not the representation) matters
             return new Number(~terms[0].toInteger().longValue());
@@ -326,7 +406,7 @@ import java.util.*;
     /**
      * Shift Left operator
      */
-    public static final Operator SHIFT_LEFT_OPERATOR = new Operator("SHIFT LEFT OPERATOR", new HashSet<String>(Arrays.asList(SHIFT_LEFT_REPS)),
+    private static final Operator SHIFT_LEFT_OPERATOR = new Operator("SHIFT LEFT", new HashSet<String>(Arrays.asList(SHIFT_LEFT_REPS)),
             SHIFT_LEFT_PRIORITY, BINARY_COUNT, new Action() {
         @Override
         public void actionVoid(Evaluable... terms) {
@@ -355,7 +435,7 @@ import java.util.*;
     /**
      * Shift Left operator
      */
-    public static final Operator SHIFT_RIGHT_OPERATOR = new Operator("SHIFT RIGHT OPERATOR", new HashSet<String>(Arrays.asList(SHIFT_RIGHT_REPS)),
+    private static final Operator SHIFT_RIGHT_OPERATOR = new Operator("SHIFT RIGHT", new HashSet<String>(Arrays.asList(SHIFT_RIGHT_REPS)),
             SHIFT_RIGHT_PRIORITY, BINARY_COUNT, new Action() {
         @Override
         public void actionVoid(Evaluable... terms) {
@@ -383,7 +463,7 @@ import java.util.*;
     /**
      * Bitwise XOr operator
      */
-    public static final Operator BITWISE_XOR_OPERATOR = new Operator("BITWISE XOR OPERATOR", new HashSet<String>(Arrays.asList(BITWISE_XOR_REPS)),
+    private static final Operator BITWISE_XOR_OPERATOR = new Operator("BITWISE XOR", new HashSet<String>(Arrays.asList(BITWISE_XOR_REPS)),
             BITWISE_XOR_PRIORITY, BINARY_COUNT, new Action() {
         @Override
         public void actionVoid(Evaluable... terms) {
@@ -411,7 +491,7 @@ import java.util.*;
     /**
      * Bitwise And operator
      */
-    public static final Operator BITWISE_AND_OPERATOR = new Operator("BITWISE AND OPERATOR", new HashSet<String>(Arrays.asList(BITWISE_AND_REPS)),
+    private static final Operator BITWISE_AND_OPERATOR = new Operator("BITWISE AND", new HashSet<String>(Arrays.asList(BITWISE_AND_REPS)),
             BITWISE_AND_PRIORITY, BINARY_COUNT, new Action() {
         @Override
         public void actionVoid(Evaluable... terms) {
@@ -439,7 +519,7 @@ import java.util.*;
     /**
      * Bitwise Or operator
      */
-    public static final Operator BITWISE_OR_OPERATOR = new Operator("BITWISE OR OPERATOR", new HashSet<String>(Arrays.asList(BITWISE_OR_REPS)),
+    private static final Operator BITWISE_OR_OPERATOR = new Operator("BITWISE OR", new HashSet<String>(Arrays.asList(BITWISE_OR_REPS)),
             BITWISE_OR_PRIORITY, BINARY_COUNT, new Action() {
         @Override
         public void actionVoid(Evaluable... terms) {
@@ -467,7 +547,7 @@ import java.util.*;
     /**
      * Modulo operator
      */
-    public static final Operator MODULO_OPERATOR = new Operator("MODULO OPERATOR", new HashSet<String>(Arrays.asList(MODULO_REPS)),
+    private static final Operator MODULO_OPERATOR = new Operator("MODULO", new HashSet<String>(Arrays.asList(MODULO_REPS)),
             MODULO_PRIORITY, BINARY_COUNT, new Action() {
         @Override
         public void actionVoid(Evaluable... terms) {
@@ -497,7 +577,7 @@ import java.util.*;
      *
      * the integer quotient is the integer part of the actual result
      */
-    public static final Operator DIVISION_OPERATOR = new Operator("DIVISION OPERATOR", new HashSet<String>(Arrays.asList(DIVISION_REPS)),
+    private static final Operator DIVISION_OPERATOR = new Operator("DIVISION", new HashSet<String>(Arrays.asList(DIVISION_REPS)),
             DIVISION_PRIORITY, BINARY_COUNT, new Action() {
         @Override
         public void actionVoid(Evaluable... terms) {
@@ -512,7 +592,7 @@ import java.util.*;
             long iValue = terms[0].toInteger().longValue() / terms[1].toInteger().longValue();
             double fValue = terms[0].toDecimal().doubleValue() / terms[1].toDecimal().doubleValue();
 
-            return new Number(iValue, fValue);
+            return new Number(fValue);
         }
 
         @Override
@@ -525,7 +605,7 @@ import java.util.*;
     /**
      * multiplication operator
      */
-    public static final Operator MULTIPLICATION_OPERATOR = new Operator("MULTIPLICATION OPERATOR", new HashSet<String>(Arrays.asList(MULTIPLICATION_REPS)),
+    private static final Operator MULTIPLICATION_OPERATOR = new Operator("MULTIPLICATION", new HashSet<String>(Arrays.asList(MULTIPLICATION_REPS)),
             MULTIPLICATION_PRIORITY, BINARY_COUNT, new Action() {
         @Override
         public void actionVoid(Evaluable... terms) {
@@ -554,7 +634,7 @@ import java.util.*;
     /**
      * subtraction operator
      */
-    public static final Operator SUBTRACTION_OPERATOR = new Operator("SUBTRACTION OPERATOR", new HashSet<String>(Arrays.asList(SUBTRACTION_REPS)),
+    private static final Operator SUBTRACTION_OPERATOR = new Operator("SUBTRACTION", new HashSet<String>(Arrays.asList(SUBTRACTION_REPS)),
             SUBTRACTION_PRIORITY, BINARY_COUNT, new Action() {
         @Override
         public void actionVoid(Evaluable... terms) {
@@ -582,7 +662,7 @@ import java.util.*;
     /**
      * addition operator
      */
-    public static final Operator ADDITION_OPERATOR = new Operator("ADDITION OPERATOR", new HashSet<String>(Arrays.asList(ADDITION_REPS)),
+    private static final Operator ADDITION_OPERATOR = new Operator("ADDITION", new HashSet<String>(Arrays.asList(ADDITION_REPS)),
             ADDITION_PRIORITY, BINARY_COUNT, new Action() {
         @Override
         public void actionVoid(Evaluable... terms) {
@@ -606,4 +686,22 @@ import java.util.*;
             return Collections.singletonList(actionDiscrete(terms));
         }
     });
+
+    /**
+     * Operator array
+     */
+    private static final Operator[] SUPPORTED_OPERATORS = {
+            NEGATION_OPERATOR,
+            NOT_OPERATOR,
+            BITWISE_OR_OPERATOR,
+            BITWISE_AND_OPERATOR,
+            BITWISE_XOR_OPERATOR,
+            ADDITION_OPERATOR,
+            SUBTRACTION_OPERATOR,
+            MULTIPLICATION_OPERATOR,
+            DIVISION_OPERATOR,
+            MODULO_OPERATOR,
+            SHIFT_LEFT_OPERATOR,
+            SHIFT_RIGHT_OPERATOR
+    };
 }

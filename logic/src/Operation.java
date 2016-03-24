@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -14,16 +15,29 @@ public class Operation {
 
     private Operator operator;
 
+    private boolean completed;
+
     // todo fixme incompatible with Action interface
     private Evaluable result;
 
-    class OperationBuilder {
+    @Override
+    public String toString() {
+        return "Operation{" +
+                "operands=" + Arrays.toString(operands.stream().map(Evaluable::toDecimal).toArray()) +
+                ", operator=" + operator +
+                ", completed=" + completed +
+                ", result=" + (result == null ? "N/A" : result.toDecimal()) +
+                ", ready=" + isOperationComputable() +
+                '}';
+    }
+
+    static class OperationBuilder {
         private List<Evaluable> operands;
 
         private Operator operator;
 
         public OperationBuilder() {
-            //       operands = new ArrayList<>();
+                   operands = new ArrayList<>();
         }
 
         /**
@@ -83,6 +97,7 @@ public class Operation {
     private Operation(List<Evaluable> operands, Operator operator) {
         this.operands = operands;
         this.operator = operator;
+        completed = false;
     }
 
     public void associateOperand(Evaluable e) {
@@ -90,19 +105,25 @@ public class Operation {
         if (operands.size() >= operator.getOperandsCount())
         {
             Debug.warn("Can't associate any more operands. Operand count reached: %d\n", operator.getOperandsCount());
-            return;
+            throw new IllegalStateException("Associating operands while operand count has been reached.");
         }
         operands.add(e);
     }
 
-    public boolean isOperationReadyForComputation() {
+    public boolean isOperationComputable() {
         return operands.size() == operator.getOperandsCount();
     }
 
     public Evaluable compute() {
-        if (!isOperationReadyForComputation())
+        if (!isOperationComputable())
             return null;
-        return result == null ? result = operator.actionDiscrete((Evaluable[]) operands.toArray()) : result;
+        result = isOperationCompleted() ? result :  operator.actionDiscrete(operands.toArray(new Evaluable[2]));
+        completed = true;
+        return result;
+    }
+
+    public boolean isOperationCompleted() {
+        return completed;
     }
 
     public List<Evaluable> getOperands() {
@@ -118,8 +139,7 @@ public class Operation {
     }
 
     private void checkIllegalModification() {
-        if (result != null) {
-            throw new IllegalStateException("Operation " + this + "has already been computed. No more modification is allowed.");
-        }
+        if (isOperationCompleted())
+            throw new UnsupportedOperationException("Operation " + this + "has already been computed. No more modification is allowed.");
     }
 }
