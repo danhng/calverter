@@ -23,14 +23,19 @@
         <item name="android:textColor">@android:color/secondary_text_light</item>
     </style>
 
+
     <style name="ResMainText" parent="TextAppearance.AppCompat.Large">
         <item name="android:textSize">50sp</item>
         <item name="android:fontFamily">monospace</item>
+       <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">start</item>
     </style>
 
     <style name="ResSupportText" parent="TextAppearance.AppCompat.Medium">
         <item name="android:textColor">@color/colorTextColor</item>
         <item name="android:textSize">30sp</item>
         <item name="android:fontFamily">monospace</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">start</item>
     </style>
 </resources>

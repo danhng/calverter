@@ -1,13 +1,18 @@
 package dtn.ncl.uk.calverter;
 
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.view.SurfaceHolder;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -64,6 +69,7 @@ public class Main extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         startCalculatorFragment();
         currentNavID = R.id.nav_calculator;
+       // fail(this, "Index of of bound.");
     }
 
     @Override
@@ -132,10 +138,10 @@ public class Main extends AppCompatActivity
     }
 
     private void startCalculatorFragment() {
-        Toast.makeText(this, "Main clicked", Toast.LENGTH_SHORT).show();
+       // Toast.makeText(this, "Main clicked", Toast.LENGTH_SHORT).show();
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        FragmentCalculator fragmentCalculator = FragmentCalculator.newInstance();
+        FragmentCalculator fragmentCalculator = FragmentCalculator.newInstance(this);
         fragmentTransaction.replace(R.id.container_main, fragmentCalculator, FragmentCalculator.name);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
@@ -144,5 +150,41 @@ public class Main extends AppCompatActivity
     @Override
     public void onFragmentInteraction(Uri uri) {
         //todo
+    }
+
+    static void restart(Context context) {
+        Context root = ((Activity)context).getBaseContext();
+        Intent i = root.getPackageManager()
+                .getLaunchIntentForPackage( root.getPackageName() );
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        context.startActivity(i);
+    }
+
+    static void fail(final Context c, String msg) {
+        AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(c);
+        dlgAlert.setMessage("An error has happened. Calverter needs to be restarted.\n" +
+                "Details: " + msg);
+        dlgAlert.setTitle("Restart required");
+        dlgAlert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                restart(c);
+            }
+        });
+        dlgAlert.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                restart(c);
+            }
+        });
+        dlgAlert.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                restart(c);
+            }
+        });
+        dlgAlert.setCancelable(false);
+        dlgAlert.create().show();
     }
 }

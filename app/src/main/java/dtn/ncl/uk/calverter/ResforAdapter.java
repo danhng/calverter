@@ -1,6 +1,7 @@
 package dtn.ncl.uk.calverter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,7 +40,6 @@ public class ResforAdapter extends ArrayAdapter<String> {
         else {
             resforItem = (LinearLayout) convertView;
         }
-
         // resfor unit name
 
         // resfor unit name
@@ -53,7 +53,6 @@ public class ResforAdapter extends ArrayAdapter<String> {
 //        t2.setTextColor(ContextCompat.getColor(getContext(), R.color.colorButtonPressed));
 
         ((TextView)resforItem.getChildAt(0)).setText(resforUnitStrings[position]);
-
 
         ((TextView)resforItem.getChildAt(1)).setText("0");
 

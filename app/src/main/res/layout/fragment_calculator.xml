@@ -11,9 +11,10 @@
     android:paddingRight="@dimen/calculator_result_padding"
     android:paddingLeft="@dimen/calculator_result_padding"
     android:layout_alignParentTop="true"
-    android:text="007"
+    android:text="M"
     android:textAlignment="textEnd"
-        style="@style/ResMainText"/>
+        style="@style/ResMainText"
+       />
 
     <TextView
         android:layout_width="match_parent"
@@ -22,9 +23,10 @@
         android:paddingRight="@dimen/calculator_result_padding"
         android:paddingLeft="@dimen/calculator_result_padding"
         android:layout_below="@+id/calculator_resMain"
-        android:text="001"
+        android:text="S"
         android:textAlignment="textEnd"
-        style="@style/ResSupportText"/>
+        style="@style/ResSupportText"
+        />
 
     <ListView
         android:id="@+id/calculator_resfor_listview"
@@ -39,7 +41,7 @@
         android:layout_height="1dp"
         android:id="@+id/calculator_divider"
         android:layout_above="@+id/gridview"
-        android:background="@android:color/darker_gray"
+        android:background="@color/colorPrimary"
         android:padding="10dp"/>
 
     <GridView xmlns:android="http://schemas.android.com/apk/res/android"
