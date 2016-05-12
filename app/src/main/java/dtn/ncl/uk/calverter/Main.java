@@ -24,8 +24,13 @@ public class Main extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         FragmentCalculator.OnFragmentInteractionListener_Calculator{
 
+    private int currentNavID;
+    private SmoothActionBarDrawerToogle toggle;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -46,14 +51,15 @@ public class Main extends AppCompatActivity
 //        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+        toggle = new SmoothActionBarDrawerToogle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        startCalculatorFragment();
+       // startCalculatorFragment();
+        //currentNavID = R.id.nav_calculator;
     }
 
     @Override
@@ -81,9 +87,9 @@ public class Main extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
+//        if (id == R.id.action_settings) {
+//            return true;
+//        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -94,21 +100,27 @@ public class Main extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_calculator) {
-           startCalculatorFragment();
+        if (id != currentNavID) {
+            if (id == R.id.nav_calculator) {
+                toggle.taskOnIdle(new Runnable() {
+                    @Override
+                    public void run() {
+                        startCalculatorFragment();
+                    }
+                });
+            } else if (id == R.id.nav_gallery) {
 
-        } else if (id == R.id.nav_gallery) {
+            } else if (id == R.id.nav_slideshow) {
 
-        } else if (id == R.id.nav_slideshow) {
+            } else if (id == R.id.nav_manage) {
 
-        } else if (id == R.id.nav_manage) {
+            } else if (id == R.id.nav_feedback) {
 
-        } else if (id == R.id.nav_feedback) {
+            } else if (id == R.id.nav_about) {
 
-        } else if (id == R.id.nav_about) {
-
+            }
         }
-
+        currentNavID = id;
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
 
@@ -120,7 +132,8 @@ public class Main extends AppCompatActivity
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         FragmentCalculator fragmentCalculator = FragmentCalculator.newInstance();
-        fragmentTransaction.add(R.id.container_main, fragmentCalculator, FragmentCalculator.name);
+        fragmentTransaction.replace(R.id.container_main, fragmentCalculator, FragmentCalculator.name);
+        fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
 
