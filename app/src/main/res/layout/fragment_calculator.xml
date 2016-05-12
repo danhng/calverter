@@ -1,30 +1,60 @@
-<RelativeLayout
- xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".FragmentCalculator"
-    android:orientation="vertical">
-    <ListView android:id="@+id/calculator_resfor_listview"
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent"
-        android:divider="@null"
+    android:orientation="vertical"
+    tools:context=".FragmentCalculator">
+    <TextView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/calculator_resMain"
+    android:paddingRight="@dimen/calculator_result_padding"
+    android:paddingLeft="@dimen/calculator_result_padding"
+    android:layout_alignParentTop="true"
+    android:text="007"
+    android:textAlignment="textEnd"
+        style="@style/ResMainText"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/calculator_resSupport"
+        android:paddingRight="@dimen/calculator_result_padding"
+        android:paddingLeft="@dimen/calculator_result_padding"
+        android:layout_below="@+id/calculator_resMain"
+        android:text="001"
+        android:textAlignment="textEnd"
+        style="@style/ResSupportText"/>
+
+    <ListView
+        android:id="@+id/calculator_resfor_listview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/calculator_resSupport"
+        android:paddingTop="5dp"
+        android:divider="@null" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:id="@+id/calculator_divider"
         android:layout_above="@+id/gridview"
-        />
+        android:background="@android:color/darker_gray"
+        android:padding="10dp"/>
 
     <GridView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@id/gridview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:numColumns="6"
-        android:verticalSpacing="5dp"
-        android:horizontalSpacing="5dp"
-        android:stretchMode="columnWidth"
-        android:gravity="center"
-        android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:gravity="center"
+        android:horizontalSpacing="5dp"
+        android:verticalSpacing="5dp"
         android:paddingBottom="5dp"
+        android:numColumns="6"
+        android:stretchMode="columnWidth"
         />
-        <!--android:columnWidth="90dp" -->
+    <!--android:columnWidth="90dp"    android:layout_below="@id/calculator_resfor_listview"-->
 </RelativeLayout>
 
